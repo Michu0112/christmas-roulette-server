@@ -65,7 +65,6 @@ app.get("/test-assignments", async (req, res) => {
 })
 
 // POST /match
-// Body: { userId: "Agata" }
 app.post("/match", async (req, res) => {
   const { userId } = req.body
 
