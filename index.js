@@ -98,7 +98,6 @@ app.post("/match", async (req, res) => {
 
       // Filter valid recipients
       const validRecipients = allUsers
-        .filter((u) => !u.recipient) // recipient not already assigned
         .filter((u) => u.id !== userId) // cannot be self
         .filter((u) => !userData.notRecipients.includes(u.id)) // respect notRecipients
         .filter((u) => u.recipient !== userId) // prevent mutual assignment
