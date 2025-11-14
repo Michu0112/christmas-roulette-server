@@ -50,7 +50,7 @@ app.get("/test-assignments", async (req, res) => {
         attempt++
       }
 
-      if (success) results.push(assignments, { valid })
+      if (success) results.push(assignments)
       else
         results.push({
           error: "Could not generate valid assignment for this run",
