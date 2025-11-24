@@ -71,7 +71,7 @@ app.get("/test-assignments", async (req, res) => {
 })
 
 // POST /match
-app.post("/match", async (req, res) => {
+app.post("/match", cors(corsOptions), async (req, res) => {
   const { userId } = req.body
 
   if (!userId) {
