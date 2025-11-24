@@ -1,9 +1,15 @@
 import express from "express"
 import { db } from "./firebase.js"
+import cors from "cors"
+
+let corsOptions = {
+  origin: ['http://localhost:5173']
+}
 
 const app = express()
 
 app.use(express.json())
+app.use(cors(corsOptions))
 
 app.get("/test-assignments", async (req, res) => {
   const runs = parseInt(req.query.runs) || 10
