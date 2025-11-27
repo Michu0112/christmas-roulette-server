@@ -63,8 +63,6 @@ app.get("/test-assignments", async (req, res) => {
     res.status(500).json({ error: err.message })
   }
 })
-
-// POST /match
 app.post("/match", async (req, res) => {
   const { userId } = req.body
 
@@ -77,15 +75,13 @@ app.post("/match", async (req, res) => {
 
     const result = await db.runTransaction(async (tx) => {
       const userDoc = await tx.get(userRef)
-      if (!userDoc.exists) {
-        throw new Error("User not found")
-      }
+      
+      if (!userDoc.exists) throw new Error("User not found")
 
       const userData = userDoc.data()
 
-      // Already has recipient?
       if (userData.recipient) {
-        return userData.recipient // Return existing assignment
+        return userData.recipient
       }
 
       // Fetch all users
@@ -95,21 +91,25 @@ app.post("/match", async (req, res) => {
         ...doc.data(),
       }))
 
+      // Collect users already drawn
+      const takenRecipients = allUsers
+        .map((u) => u.recipient)
+        .filter((r) => !!r)
+
       // Filter valid recipients
       const validRecipients = allUsers
-        .filter((u) => u.id !== userId) // cannot be self
-        .filter((u) => !userData.notRecipients.includes(u.id)) // respect notRecipients
-        .filter((u) => u.recipient !== userId) // prevent mutual assignment
+        .filter((u) => u.id !== userId)
+        .filter((u) => !userData.notRecipients.includes(u.id))
+        .filter((u) => u.recipient !== userId)
+        .filter((u) => !takenRecipients.includes(u.id)) // ❗ NEW RULE
 
       if (validRecipients.length === 0) {
         throw new Error("No valid recipients available for this user")
       }
 
-      // Pick random recipient
       const recipient =
         validRecipients[Math.floor(Math.random() * validRecipients.length)]
 
-      // Assign recipient
       tx.update(userRef, { recipient: recipient.id })
 
       return recipient
